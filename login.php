@@ -28,10 +28,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php"); // Redirect to dashboard
             exit();
         } else {
-            echo "Invalid login credentials!";
+            echo "<div class='alert alert-danger'>Invalid login credentials!</div>";
         }
     } else {
-        echo "Invalid login credentials!";
+        echo "<div class='alert alert-danger'>Invalid login credentials!</div>";
     }
 
     // Close connections

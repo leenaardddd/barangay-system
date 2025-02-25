@@ -1,8 +1,8 @@
 <?php
 $servername = "localhost";
-$username = "root";
-$password = "";
-$database = "barangay_db";
+$username = "root";  
+$password = "";  
+$database = "barangay_db"; 
 
 $conn = new mysqli($servername, $username, $password, $database);
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION["user"])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit();
 }
@@ -73,7 +73,7 @@ if (!isset($_SESSION["user"])) {
         </div>
     </nav>
     <div class="container welcome-container mt-4">
-        <h2>Welcome, <?php echo $_SESSION["user"]; ?>!</h2>
+        <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
     </div>
     <div class="container">
         <div class="selection">
