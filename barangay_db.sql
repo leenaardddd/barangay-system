@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     resident_name VARCHAR(100) NOT NULL,
     details TEXT NOT NULL,
-    status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending'
+    status ENUM('Pending', 'Approved') DEFAULT 'Pending'
 );
 
 -- Create announcements table
@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     resident_id INT NOT NULL,
     appointment_date DATE NOT NULL,
     purpose TEXT NOT NULL,
+    status ENUM('Pending', 'Approved') DEFAULT 'Pending',
     FOREIGN KEY (resident_id) REFERENCES residents(id)
 );
 
@@ -49,8 +50,15 @@ CREATE TABLE IF NOT EXISTS businesses (
     business_name VARCHAR(100) NOT NULL,
     owner_name VARCHAR(100) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    contact VARCHAR(20) NOT NULL
+    contact VARCHAR(20) NOT NULL,
+    status ENUM('Pending', 'Approved') DEFAULT 'Pending'
 );
 
 -- Insert a sample user (password is 'password' hashed using bcrypt)
 INSERT INTO users (username, password) VALUES ('admin', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeFupQeX9Y6Y0lZ8l5h8y5l5l5l5l5l5l');
+
+-- Add status column to appointments table
+ALTER TABLE appointments ADD COLUMN status ENUM('Pending', 'Approved') DEFAULT 'Pending';
+
+-- Add status column to businesses table
+ALTER TABLE businesses ADD COLUMN status ENUM('Pending', 'Approved') DEFAULT 'Pending';

@@ -11,10 +11,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_complaint'])) {
     $resident_name = $_POST['resident_name'];
     $details = $_POST['details'];
 
-    $stmt = $conn->prepare("INSERT INTO complaints (resident_name, details) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO complaints (resident_name, details, status) VALUES (?, ?, 'Pending')");
     $stmt->bind_param("ss", $resident_name, $details);
     if ($stmt->execute()) {
-        echo "Complaint submitted!";
+        echo "Complaint submitted and pending approval!";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_complaint'])) {
     $stmt = $conn->prepare("UPDATE complaints SET status=? WHERE id=?");
     $stmt->bind_param("si", $status, $id);
     if ($stmt->execute()) {
-        echo "Complaint updated!";
+        echo "Complaint status updated!";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -48,6 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_complaint'])) {
         echo "Error: " . $stmt->error;
     }
     $stmt->close();
+}
+
+// DELETE all complaints
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_all_complaints'])) {
+    $sql = "DELETE FROM complaints";
+    if ($conn->query($sql) === TRUE) {
+        echo "All complaints deleted!";
+    } else {
+        echo "Error: " . $conn->error;
+    }
 }
 
 // READ all complaints
@@ -79,6 +89,10 @@ $result = $conn->query($sql);
         </form>
 
         <h2>Complaints</h2>
+        <form method="POST" class="mb-4">
+            <input type="hidden" name="delete_all_complaints" value="1">
+            <button type="submit" class="btn btn-danger">Delete All Complaints</button>
+        </form>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -101,8 +115,7 @@ $result = $conn->query($sql);
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                 <select name="status" class="form-select form-select-sm" required>
                                     <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                    <option value="In Progress" <?php if ($row['status'] == 'In Progress') echo 'selected'; ?>>In Progress</option>
-                                    <option value="Resolved" <?php if ($row['status'] == 'Resolved') echo 'selected'; ?>>Resolved</option>
+                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
                                 </select>
                                 <input type="hidden" name="update_complaint" value="1">
                                 <button type="submit" class="btn btn-warning btn-sm mt-1">Update</button>

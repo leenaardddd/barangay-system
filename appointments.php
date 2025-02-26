@@ -8,10 +8,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['schedule_appointment']
     $appointment_date = $_POST['appointment_date'];
     $purpose = $_POST['purpose'];
 
-    $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose) VALUES (?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose, status) VALUES (?, ?, ?, 'Pending')");
     $stmt->bind_param("iss", $resident_id, $appointment_date, $purpose);
     if ($stmt->execute()) {
-        echo "Appointment scheduled!";
+        echo "Appointment scheduled and pending approval!";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -23,9 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_appointment']))
     $id = $_POST['id'];
     $appointment_date = $_POST['appointment_date'];
     $purpose = $_POST['purpose'];
+    $status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE appointments SET appointment_date=?, purpose=? WHERE id=?");
-    $stmt->bind_param("ssi", $appointment_date, $purpose, $id);
+    $stmt = $conn->prepare("UPDATE appointments SET appointment_date=?, purpose=?, status=? WHERE id=?");
+    $stmt->bind_param("sssi", $appointment_date, $purpose, $status, $id);
     if ($stmt->execute()) {
         echo "Appointment updated!";
     } else {
@@ -88,6 +89,7 @@ $result = $conn->query($sql);
                     <th>Resident ID</th>
                     <th>Appointment Date</th>
                     <th>Purpose</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -98,6 +100,7 @@ $result = $conn->query($sql);
                         <td><?php echo $row['resident_id']; ?></td>
                         <td><?php echo $row['appointment_date']; ?></td>
                         <td><?php echo $row['purpose']; ?></td>
+                        <td><?php echo $row['status']; ?></td>
                         <td>
                             <form method="POST" style="display:inline-block;">
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
@@ -109,6 +112,10 @@ $result = $conn->query($sql);
                                 <input type="hidden" name="update_appointment" value="1">
                                 <input type="date" name="appointment_date" value="<?php echo $row['appointment_date']; ?>" required>
                                 <input type="text" name="purpose" value="<?php echo $row['purpose']; ?>" required>
+                                <select name="status" class="form-select form-select-sm" required>
+                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
+                                </select>
                                 <button type="submit" class="btn btn-warning btn-sm">Update</button>
                             </form>
                         </td>

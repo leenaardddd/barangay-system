@@ -9,10 +9,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_business'])) 
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    $stmt = $conn->prepare("INSERT INTO businesses (business_name, owner_name, address, contact) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO businesses (business_name, owner_name, address, contact, status) VALUES (?, ?, ?, ?, 'Pending')");
     $stmt->bind_param("ssss", $business_name, $owner_name, $address, $contact);
     if ($stmt->execute()) {
-        echo "Business registered!";
+        echo "Business registered and pending approval!";
     } else {
         echo "Error: " . $stmt->error;
     }
@@ -26,9 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_business'])) {
     $owner_name = $_POST['owner_name'];
     $address = $_POST['address'];
     $contact = $_POST['contact'];
+    $status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE businesses SET business_name=?, owner_name=?, address=?, contact=? WHERE id=?");
-    $stmt->bind_param("ssssi", $business_name, $owner_name, $address, $contact, $id);
+    $stmt = $conn->prepare("UPDATE businesses SET business_name=?, owner_name=?, address=?, contact=?, status=? WHERE id=?");
+    $stmt->bind_param("sssssi", $business_name, $owner_name, $address, $contact, $status, $id);
     if ($stmt->execute()) {
         echo "Business updated!";
     } else {
@@ -101,6 +102,7 @@ $result = $conn->query($sql);
                     <th>Owner Name</th>
                     <th>Address</th>
                     <th>Contact</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -112,6 +114,7 @@ $result = $conn->query($sql);
                         <td><?php echo $row['owner_name']; ?></td>
                         <td><?php echo $row['address']; ?></td>
                         <td><?php echo $row['contact']; ?></td>
+                        <td><?php echo $row['status']; ?></td>
                         <td>
                             <form method="POST" style="display:inline-block;">
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
@@ -125,6 +128,10 @@ $result = $conn->query($sql);
                                 <input type="text" name="owner_name" value="<?php echo $row['owner_name']; ?>" required>
                                 <input type="text" name="address" value="<?php echo $row['address']; ?>" required>
                                 <input type="text" name="contact" value="<?php echo $row['contact']; ?>" required>
+                                <select name="status" class="form-select form-select-sm" required>
+                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
+                                </select>
                                 <button type="submit" class="btn btn-warning btn-sm">Update</button>
                             </form>
                         </td>

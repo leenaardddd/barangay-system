@@ -33,6 +33,18 @@
                     <a href="announcements.php" class="btn btn-danger">Update</a>
                 </div>
             </div>
+            <div class="col-md-4 mt-4">
+                <div class="card text-center p-3">
+                    <h5>Manage Businesses</h5>
+                    <a href="businesses.php" class="btn btn-danger">Manage</a>
+                </div>
+            </div>
+            <div class="col-md-4 mt-4">
+                <div class="card text-center p-3">
+                    <h5>Manage Appointments</h5>
+                    <a href="appointments.php" class="btn btn-danger">Manage</a>
+                </div>
+            </div>
         </div>
     </div>
 </body>
