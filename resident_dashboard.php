@@ -151,6 +151,40 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="card text-center p-3" id="announcementCard">
+                    <h5>View Barangay Announcements</h5>
+                    <button type="submit" class="btn btn-primary toggle-btn w-100" onclick="window.location.href='announcements.php'">
+                        View Announcements
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-center p-3" id="directoryCard">
+                    <h5>Check Online Directory</h5>
+                    <button type="submit" class="btn btn-primary toggle-btn w-100" onclick="window.location.href='directory.php'">
+                        View Directory
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card text-center p-3" id="statusCard">
+                    <h5>Track Request/Complaint Status</h5>
+                    <button class="btn btn-primary toggle-btn" onclick="toggleCard('statusCard', 'statusForm')">Expand</button>
+                    <div class="form-container" id="statusForm">
+                        <form action="track_status.php" method="GET">
+                            <div class="mb-3">
+                                <label class="form-label">Tracking ID</label>
+                                <input type="text" class="form-control" name="tracking_id" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Track Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

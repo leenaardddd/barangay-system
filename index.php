@@ -14,7 +14,7 @@
             font-family: 'Arial', sans-serif;
         }
         .navbar {
-            background-color: #D32F2F; /* Darker red */
+            background-color: #103D6B; 
             padding: 10px 20px;
         }
         .container {
