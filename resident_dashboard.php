@@ -33,7 +33,7 @@
         }
 
         .card.expanded {
-            height: 300px !important; /* Adjust for expanded state */
+            height: auto !important; /* Allow the card to expand based on content */
         }
 
         .card:hover {
@@ -63,6 +63,7 @@
             transition: 0.3s;
         }
 
+        
         .btn-primary:hover {
             background-color: #0056b3;
         }
