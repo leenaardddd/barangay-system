@@ -4,7 +4,7 @@ Here's the updated version, separating what residents and officials can do:
 
 **Digital Barangay System**  
 
-### **Residents Can:**  
+### **Residents**  
 
 #### **Create**  
 <!-- - Log Complaints & Requests (e.g., barangay clearance, disputes)   -->
@@ -12,9 +12,9 @@ Here's the updated version, separating what residents and officials can do:
 <!-- - Register Businesses & Manage Permits   -->
 
 #### **Read**  
-- View Barangay Announcements  
-- Check Online Directory (officials, services, emergency contacts)  
-- Track Request/Complaint Status  
+<!-- - View Barangay Announcements   -->
+<!-- - Check Online Directory (officials, services, emergency contacts)   -->
+<!-- - Track Request/Complaint Status   -->
 
 #### **Update**  
 - Modify Appointments (reschedule/cancel visits)  
@@ -26,10 +26,11 @@ Here's the updated version, separating what residents and officials can do:
 
 ---
 
-### **Barangay Officials Can:**  
+### **Barangay Officials**  
 
 #### **Create**  
 <!-- - Register Resident Accounts (full name, birthdate, address, contact) -->
+- Create Barangay Announcements
 
 #### **Read**  
 <!-- - Access Resident Information for Verification & Assistance   -->
@@ -39,7 +40,9 @@ Here's the updated version, separating what residents and officials can do:
 <!-- - Update Status of Requests/Complaints   -->
 <!-- - Modify or Remove Business Registrations   -->
 - Clear Notifications & Messages  
+- Update Barangay Announcements
 
 #### **Delete**  
 <!-- - Remove Resident Accounts (upon request or official reasons)   -->
 <!-- - Delete Entire Chat or Complaint History (if necessary)   -->
+- DeleteBarangay Announcements

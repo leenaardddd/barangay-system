@@ -2,24 +2,45 @@
 session_start();
 include 'db_connect.php';
 
+// Debugging: Print session variables
+echo '<div class="alert alert-info">You are logged in as ' . $_SESSION['username'] . ' (' . $_SESSION['role'] . ')</div>';
+
+// Check if the user is an official
+$is_official = isset($_SESSION['role']) && $_SESSION['role'] === 'official';
+if (!$is_official) {
+    echo '<div class="alert alert-danger">You are not authorized to perform this action.</div>';
+}
+
 // CREATE an appointment
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['schedule_appointment'])) {
     $resident_id = $_POST['resident_id'];
     $appointment_date = $_POST['appointment_date'];
     $purpose = $_POST['purpose'];
 
-    $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose, status) VALUES (?, ?, ?, 'Pending')");
-    $stmt->bind_param("iss", $resident_id, $appointment_date, $purpose);
-    if ($stmt->execute()) {
-        echo "Appointment scheduled and pending approval!";
+    // Check if resident_id exists
+    $stmt = $conn->prepare("SELECT id FROM residents WHERE id = ?");
+    $stmt->bind_param("i", $resident_id);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        $stmt->close();
+        $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose, status) VALUES (?, ?, ?, 'Pending')");
+        $stmt->bind_param("iss", $resident_id, $appointment_date, $purpose);
+        if ($stmt->execute()) {
+            echo '<div class="alert alert-success">Appointment scheduled and pending approval!</div>';
+        } else {
+            echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        }
+        $stmt->close();
     } else {
-        echo "Error: " . $stmt->error;
+        echo '<div class="alert alert-danger">Error: Resident ID does not exist.</div>';
+        $stmt->close();
     }
-    $stmt->close();
 }
 
-// UPDATE an appointment
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_appointment'])) {
+// UPDATE an appointment (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_appointment'])) {
     $id = $_POST['id'];
     $appointment_date = $_POST['appointment_date'];
     $purpose = $_POST['purpose'];
@@ -35,8 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_appointment']))
     $stmt->close();
 }
 
-// DELETE an appointment
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_appointment'])) {
+// DELETE an appointment (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_appointment'])) {
     $id = $_POST['id'];
 
     $stmt = $conn->prepare("DELETE FROM appointments WHERE id=?");
@@ -102,22 +123,24 @@ $result = $conn->query($sql);
                         <td><?php echo $row['purpose']; ?></td>
                         <td><?php echo $row['status']; ?></td>
                         <td>
-                            <form method="POST" style="display:inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="delete_appointment" value="1">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                            <form method="POST" style="display:inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="update_appointment" value="1">
-                                <input type="date" name="appointment_date" value="<?php echo $row['appointment_date']; ?>" required>
-                                <input type="text" name="purpose" value="<?php echo $row['purpose']; ?>" required>
-                                <select name="status" class="form-select form-select-sm" required>
-                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
-                                </select>
-                                <button type="submit" class="btn btn-warning btn-sm">Update</button>
-                            </form>
+                            <?php if ($is_official) { ?>
+                                <form method="POST" style="display:inline-block;">
+                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                    <input type="hidden" name="delete_appointment" value="1">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                <form method="POST" style="display:inline-block;">
+                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                    <input type="hidden" name="update_appointment" value="1">
+                                    <input type="date" name="appointment_date" value="<?php echo $row['appointment_date']; ?>" required>
+                                    <input type="text" name="purpose" value="<?php echo $row['purpose']; ?>" required>
+                                    <select name="status" class="form-select form-select-sm" required>
+                                        <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
+                                        <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-warning btn-sm">Update</button>
+                                </form>
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php } ?>

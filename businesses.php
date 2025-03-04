@@ -2,6 +2,9 @@
 session_start();
 include 'db_connect.php';
 
+// Check if the user is an official
+$is_official = isset($_SESSION['role']) && $_SESSION['role'] === 'official';
+
 // CREATE a business registration
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_business'])) {
     $business_name = $_POST['business_name'];
@@ -19,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_business'])) 
     $stmt->close();
 }
 
-// UPDATE a business registration
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_business'])) {
+// UPDATE a business registration (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_business'])) {
     $id = $_POST['id'];
     $business_name = $_POST['business_name'];
     $owner_name = $_POST['owner_name'];
@@ -38,8 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_business'])) {
     $stmt->close();
 }
 
-// DELETE a business registration
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_business'])) {
+// DELETE a business registration (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_business'])) {
     $id = $_POST['id'];
 
     $stmt = $conn->prepare("DELETE FROM businesses WHERE id=?");
@@ -116,30 +119,90 @@ $result = $conn->query($sql);
                         <td><?php echo $row['contact']; ?></td>
                         <td><?php echo $row['status']; ?></td>
                         <td>
-                            <form method="POST" style="display:inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="delete_business" value="1">
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                            <form method="POST" style="display:inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <input type="hidden" name="update_business" value="1">
-                                <input type="text" name="business_name" value="<?php echo $row['business_name']; ?>" required>
-                                <input type="text" name="owner_name" value="<?php echo $row['owner_name']; ?>" required>
-                                <input type="text" name="address" value="<?php echo $row['address']; ?>" required>
-                                <input type="text" name="contact" value="<?php echo $row['contact']; ?>" required>
-                                <select name="status" class="form-select form-select-sm" required>
-                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
-                                </select>
-                                <button type="submit" class="btn btn-warning btn-sm">Update</button>
-                            </form>
+                            <?php if ($is_official) { ?>
+                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateModal" data-id="<?php echo $row['id']; ?>" data-business_name="<?php echo $row['business_name']; ?>" data-owner_name="<?php echo $row['owner_name']; ?>" data-address="<?php echo $row['address']; ?>" data-contact="<?php echo $row['contact']; ?>" data-status="<?php echo $row['status']; ?>">Update</button>
+                                <form method="POST" style="display:inline-block;">
+                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                    <input type="hidden" name="delete_business" value="1">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
     </div>
+
+    <!-- Update Modal -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Business</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <input type="hidden" name="update_business" value="1">
+                        <input type="hidden" name="id" id="update-id">
+                        <div class="mb-3">
+                            <label for="update-business_name" class="form-label">Business Name</label>
+                            <input type="text" class="form-control" name="business_name" id="update-business_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="update-owner_name" class="form-label">Owner Name</label>
+                            <input type="text" class="form-control" name="owner_name" id="update-owner_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="update-address" class="form-label">Address</label>
+                            <input type="text" class="form-control" name="address" id="update-address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="update-contact" class="form-label">Contact Number</label>
+                            <input type="text" class="form-control" name="contact" id="update-contact" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="update-status" class="form-label">Status</label>
+                            <select class="form-select" name="status" id="update-status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Business</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var updateModal = document.getElementById('updateModal');
+        updateModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var business_name = button.getAttribute('data-business_name');
+            var owner_name = button.getAttribute('data-owner_name');
+            var address = button.getAttribute('data-address');
+            var contact = button.getAttribute('data-contact');
+            var status = button.getAttribute('data-status');
+
+            var modalIdInput = updateModal.querySelector('#update-id');
+            var modalBusinessNameInput = updateModal.querySelector('#update-business_name');
+            var modalOwnerNameInput = updateModal.querySelector('#update-owner_name');
+            var modalAddressInput = updateModal.querySelector('#update-address');
+            var modalContactInput = updateModal.querySelector('#update-contact');
+            var modalStatusInput = updateModal.querySelector('#update-status');
+
+            modalIdInput.value = id;
+            modalBusinessNameInput.value = business_name;
+            modalOwnerNameInput.value = owner_name;
+            modalAddressInput.value = address;
+            modalContactInput.value = contact;
+            modalStatusInput.value = status;
+        });
+    </script>
 </body>
 </html>
 <?php $conn->close(); ?>

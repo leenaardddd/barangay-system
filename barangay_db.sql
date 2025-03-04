@@ -62,3 +62,6 @@ ALTER TABLE appointments ADD COLUMN status ENUM('Pending', 'Approved') DEFAULT '
 
 -- Add status column to businesses table
 ALTER TABLE businesses ADD COLUMN status ENUM('Pending', 'Approved') DEFAULT 'Pending';
+
+ALTER TABLE users ADD COLUMN role ENUM('official', 'resident') NOT NULL;
+

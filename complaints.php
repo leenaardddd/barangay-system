@@ -2,6 +2,15 @@
 session_start();
 include 'db_connect.php';
 
+// Debugging: Print session variables
+echo '<div class="alert alert-info">You are logged in as ' . $_SESSION['username'] . ' (' . $_SESSION['role'] . ')</div>';
+
+// Check if the user is an official
+$is_official = isset($_SESSION['role']) && $_SESSION['role'] === 'official';
+if (!$is_official) {
+    echo '<div class="alert alert-danger">You are not authorized to perform this action.</div>';
+}
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -14,15 +23,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_complaint'])) {
     $stmt = $conn->prepare("INSERT INTO complaints (resident_name, details, status) VALUES (?, ?, 'Pending')");
     $stmt->bind_param("ss", $resident_name, $details);
     if ($stmt->execute()) {
-        echo "Complaint submitted and pending approval!";
+        echo '<div class="alert alert-success">Complaint submitted and pending approval!</div>';
     } else {
-        echo "Error: " . $stmt->error;
+        echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
     }
     $stmt->close();
 }
 
-// UPDATE complaint status
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_complaint'])) {
+// UPDATE complaint status (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_complaint'])) {
     $id = $_POST['id'];
     $status = $_POST['status'];
 
@@ -36,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_complaint'])) {
     $stmt->close();
 }
 
-// DELETE a complaint
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_complaint'])) {
+// DELETE a complaint (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_complaint'])) {
     $id = $_POST['id'];
 
     $stmt = $conn->prepare("DELETE FROM complaints WHERE id=?");
@@ -50,8 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_complaint'])) {
     $stmt->close();
 }
 
-// DELETE all complaints
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_all_complaints'])) {
+// DELETE all complaints (only for officials)
+if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_all_complaints'])) {
     $sql = "DELETE FROM complaints";
     if ($conn->query($sql) === TRUE) {
         echo "All complaints deleted!";
@@ -89,10 +98,12 @@ $result = $conn->query($sql);
         </form>
 
         <h2>Complaints</h2>
+        <?php if ($is_official) { ?>
         <form method="POST" class="mb-4">
             <input type="hidden" name="delete_all_complaints" value="1">
             <button type="submit" class="btn btn-danger">Delete All Complaints</button>
         </form>
+        <?php } ?>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -111,26 +122,62 @@ $result = $conn->query($sql);
                         <td><?php echo $row['details']; ?></td>
                         <td><?php echo $row['status']; ?></td>
                         <td>
-                            <form method="POST" style="display:inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                <select name="status" class="form-select form-select-sm" required>
-                                    <option value="Pending" <?php if ($row['status'] == 'Pending') echo 'selected'; ?>>Pending</option>
-                                    <option value="Approved" <?php if ($row['status'] == 'Approved') echo 'selected'; ?>>Approved</option>
-                                </select>
-                                <input type="hidden" name="update_complaint" value="1">
-                                <button type="submit" class="btn btn-warning btn-sm mt-1">Update</button>
-                            </form>
+                            <?php if ($is_official) { ?>
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateModal" data-id="<?php echo $row['id']; ?>" data-status="<?php echo $row['status']; ?>">Update</button>
                             <form method="POST" style="display:inline-block;">
                                 <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                 <input type="hidden" name="delete_complaint" value="1">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
+                            <?php } ?>
                         </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
     </div>
+
+    <!-- Update Modal -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Complaint Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <input type="hidden" name="update_complaint" value="1">
+                        <input type="hidden" name="id" id="update-id">
+                        <div class="mb-3">
+                            <label for="update-status" class="form-label">Status</label>
+                            <select class="form-select" name="status" id="update-status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var updateModal = document.getElementById('updateModal');
+        updateModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var id = button.getAttribute('data-id');
+            var status = button.getAttribute('data-status');
+
+            var modalIdInput = updateModal.querySelector('#update-id');
+            var modalStatusInput = updateModal.querySelector('#update-status');
+
+            modalIdInput.value = id;
+            modalStatusInput.value = status;
+        });
+    </script>
 </body>
 </html>
 <?php $conn->close(); ?>

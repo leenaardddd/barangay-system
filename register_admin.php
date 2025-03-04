@@ -8,8 +8,8 @@ if ($conn->connect_error) {
 }
 
 // Set username and hashed password
-$username = "user"; // Change this if needed
-$password = password_hash("asd", PASSWORD_DEFAULT); // Securely hash password
+$username = "admin2"; // Change this if needed
+$password = password_hash("password123", PASSWORD_DEFAULT); // Securely hash password
 
 // Insert into the users table
 $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
