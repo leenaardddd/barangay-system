@@ -30,7 +30,7 @@ Here's the updated version, separating what residents and officials can do:
 
 #### **Create**  
 <!-- - Register Resident Accounts (full name, birthdate, address, contact) -->
-- Create Barangay Announcements
+<!-- - Create Barangay Announcements -->
 
 #### **Read**  
 <!-- - Access Resident Information for Verification & Assistance   -->
@@ -39,10 +39,9 @@ Here's the updated version, separating what residents and officials can do:
 <!-- - Edit Resident Details (contact info, address updates)   -->
 <!-- - Update Status of Requests/Complaints   -->
 <!-- - Modify or Remove Business Registrations   -->
-- Clear Notifications & Messages  
-- Update Barangay Announcements
+<!-- - Update Barangay Announcements -->
 
 #### **Delete**  
 <!-- - Remove Resident Accounts (upon request or official reasons)   -->
 <!-- - Delete Entire Chat or Complaint History (if necessary)   -->
-- DeleteBarangay Announcements
+<!-- - DeleteBarangay Announcements -->
