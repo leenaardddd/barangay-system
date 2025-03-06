@@ -70,12 +70,14 @@
     </style>
 </head>
 <body>
+
 <nav class="navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand text-white fw-bold" href="#">Resident Dashboard</a>
         <a class="btn btn-outline-light" href="index.php">Logout</a>
     </div>
 </nav>
+
     
     <div class="container">
         <div class="row g-4">
