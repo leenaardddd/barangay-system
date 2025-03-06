@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS residents (
     full_name VARCHAR(100) NOT NULL,
     birthdate DATE NOT NULL,
     address VARCHAR(255) NOT NULL,
-    contact_number VARCHAR(20) NOT NULL
+    contact_number VARCHAR(11) NOT NULL
 );
 
 -- Create complaints table

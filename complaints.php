@@ -76,6 +76,7 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complaints Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -140,11 +141,15 @@ if (!$result) {
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>! 
                 You are logged in as an <strong><?php echo $_SESSION['role'] ?? 'No Role'; ?></strong>.
             </div>
+            <a class="btn btn-outline-light" href="index.php">Logout</a>
         </div>
     </nav>
 
     <div class="container mt-4">
         <div class="card p-4">
+        <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
             <h2 class="text-center">Submit a Complaint</h2>
             <form method="POST" class="mt-3">
                 <input type="hidden" name="submit_complaint" value="1">

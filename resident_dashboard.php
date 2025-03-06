@@ -70,14 +70,14 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand text-white fw-bold" href="#">Resident Dashboard</a>
-            <form class="d-flex" action="index.php" method="POST">
-                <button class="btn btn-outline-light" type="submit">Logout</button>
-            </form>
-        </div>
-    </nav>
+
+<nav class="navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white fw-bold" href="#">Resident Dashboard</a>
+        <a class="btn btn-outline-light" href="index.php">Logout</a>
+    </div>
+</nav>
+
     
     <div class="container">
         <div class="row g-4">
@@ -148,7 +148,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Contact Number</label>
-                                <input type="text" class="form-control" name="contact" required>
+                                <input type="text" class="form-control" name="contact" required maxlength="11">
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Register Business</button>
                         </form>
@@ -208,6 +208,27 @@
                 button.innerText = "Collapse";
             }
         }
+
+        document.querySelector('form[action="appointments.php"]').addEventListener('submit', function(event) {
+            const appointmentDate = new Date(document.querySelector('input[name="appointment_date"]').value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set to start of the day
+
+            if (appointmentDate < today) {
+                event.preventDefault();
+                alert("Cannot set appointment date in the past.");
+            }
+        });
+
+        document.querySelector('form[action="businesses.php"]').addEventListener('submit', function(event) {
+            const contactNumber = document.querySelector('input[name="contact"]').value;
+            const contactNumberPattern = /^09\d{9}$/;
+
+            if (!contactNumberPattern.test(contactNumber)) {
+                event.preventDefault();
+                alert("Contact number must be exactly 11 digits and follow the format 09xxxxxxxxx.");
+            }
+        });
     </script>
 </body>
 </html>

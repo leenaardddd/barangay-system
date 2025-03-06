@@ -21,14 +21,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_business'])) 
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    $stmt = $conn->prepare("INSERT INTO businesses (business_name, owner_name, address, contact, status) VALUES (?, ?, ?, ?, 'Pending')");
-    $stmt->bind_param("ssss", $business_name, $owner_name, $address, $contact);
-    if ($stmt->execute()) {
-        // $notification = '<div class="text-white">Business registered and pending approval!</div>';
+    // Validate contact number
+    if (!preg_match('/^\d{11}$/', $contact)) {
+        $notification = '<div class="text-white">Error: Contact number must be 11 digits.</div>';
     } else {
-        $notification = '<div class="text-white">Error: ' . $stmt->error . '</div>';
+        $stmt = $conn->prepare("INSERT INTO businesses (business_name, owner_name, address, contact, status) VALUES (?, ?, ?, ?, 'Pending')");
+        $stmt->bind_param("ssss", $business_name, $owner_name, $address, $contact);
+        if ($stmt->execute()) {
+            $notification = '<div class="alert alert-success">Business registered and pending approval!</div>';
+        } else {
+            $notification = '<div class="text-white">Error: ' . $stmt->error . '</div>';
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // UPDATE a business registration (only for officials)
@@ -40,14 +45,19 @@ if ($is_official && $_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update
     $contact = $_POST['contact'];
     $status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE businesses SET business_name=?, owner_name=?, address=?, contact=?, status=? WHERE id=?");
-    $stmt->bind_param("sssssi", $business_name, $owner_name, $address, $contact, $status, $id);
-    if ($stmt->execute()) {
-        echo '<div class="alert alert-success" id="update-success-popup">Business updated!</div>';
+    // Validate contact number
+    if (!preg_match('/^\d{11}$/', $contact)) {
+        echo '<div class="alert alert-danger">Error: Contact number must be 11 digits.</div>';
     } else {
-        echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        $stmt = $conn->prepare("UPDATE businesses SET business_name=?, owner_name=?, address=?, contact=?, status=? WHERE id=?");
+        $stmt->bind_param("sssssi", $business_name, $owner_name, $address, $contact, $status, $id);
+        if ($stmt->execute()) {
+            echo '<div class="alert alert-success" id="update-success-popup">Business updated!</div>';
+        } else {
+            echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // DELETE a business registration (only for officials)
@@ -77,6 +87,7 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Business Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -141,12 +152,16 @@ if (!$result) {
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>! 
                 You are logged in as an <strong><?php echo $_SESSION['role'] ?? 'No Role'; ?></strong>.
             </div>
+            <a class="btn btn-outline-light" href="index.php">Logout</a>
             <?php if (isset($notification)) echo $notification; ?>
         </div>
     </nav>
 
     <div class="container mt-4">
         <div class="card p-4">
+            <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
             <h2 class="text-center">Register a New Business</h2>
             <form method="POST" class="mt-3">
                 <input type="hidden" name="register_business" value="1">
@@ -164,7 +179,7 @@ if (!$result) {
                 </div>
                 <div class="mb-3">
                     <label for="contact" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" name="contact" required>
+                    <input type="text" class="form-control" name="contact" required maxlength="11" pattern="\d{11}">
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Register Business</button>
             </form>
@@ -241,7 +256,7 @@ if (!$result) {
                         </div>
                         <div class="mb-3">
                             <label for="update-contact" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control" name="contact" id="update-contact" required>
+                            <input type="text" class="form-control" name="contact" id="update-contact" required maxlength="11" pattern="\d{11}">
                         </div>
                         <div class="mb-3">
                             <label for="update-status" class="form-label">Status</label>
@@ -257,7 +272,7 @@ if (!$result) {
         </div>
     </div>
 
-    <div class="popup-notification alert alert-success" id="update-success-popup">Business updated!</div>
+    <!-- <div class="popup-notification alert alert-success" id="update-success-popup">Business updated!</div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

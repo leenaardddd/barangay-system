@@ -21,15 +21,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_resident'])) {
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    $stmt = $conn->prepare("INSERT INTO residents (full_name, birthdate, address, contact_number) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $birthdate, $address, $contact);
-    if ($stmt->execute()) {
-        $notification = '<div class="alert alert-success">New resident added successfully!</div>';
-        $popup_message = 'Resident created!';
+    // Validate birthdate
+    if (strtotime($birthdate) > time()) {
+        $notification = '<div class="alert alert-danger">Birthdate cannot be in the future.</div>';
+    } elseif (!preg_match('/^\d{10}$/', $contact)) {
+        $notification = '<div class="alert alert-danger">Invalid contact number format. Use 11 digits.</div>';
     } else {
-        echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        $stmt = $conn->prepare("INSERT INTO residents (full_name, birthdate, address, contact_number) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $name, $birthdate, $address, $contact);
+        if ($stmt->execute()) {
+            $notification = '<div class="alert alert-success">New resident added successfully!</div>';
+            $popup_message = 'Resident created!';
+        } else {
+            echo '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // UPDATE resident details
@@ -76,6 +83,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Residents Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -140,12 +148,17 @@ $result = $conn->query($sql);
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>! 
                 You are logged in as an <strong><?php echo $_SESSION['role'] ?? 'No Role'; ?></strong>.
             </div>
+            <a class="btn btn-outline-light" href="index.php">Logout</a>
         </div>
     </nav>
 
     <div class="container mt-4">
         <div class="card p-4">
+            <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
             <h2 class="text-center">Manage Residents</h2>
+            <?php if (isset($notification)) echo $notification; ?>
             <form method="POST" class="mb-4">
                 <input type="hidden" name="add_resident" value="1">
                 <div class="mb-3">
@@ -162,7 +175,7 @@ $result = $conn->query($sql);
                 </div>
                 <div class="mb-3">
                     <label for="contact" class="form-label">Contact Number</label>
-                    <input type="text" class="form-control" name="contact" required>
+                    <input type="text" class="form-control" name="contact" pattern="\d{1,11}" maxlength="11" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Add Resident</button>
             </form>
@@ -228,7 +241,7 @@ $result = $conn->query($sql);
                         </div>
                         <div class="mb-3">
                             <label for="update-contact" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control" name="contact" id="update-contact" required>
+                            <input type="text" class="form-control" name="contact" id="update-contact" pattern="\d{1,11}" maxlength="11" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Update Resident</button>
                     </form>
