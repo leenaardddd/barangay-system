@@ -73,6 +73,9 @@
     <nav class="navbar navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" href="#">Resident Dashboard</a>
+            <form class="d-flex" action="index.php" method="POST">
+                <button class="btn btn-outline-light" type="submit">Logout</button>
+            </form>
         </div>
     </nav>
     
