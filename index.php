@@ -5,91 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Barangay Information System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
         body {
-            background-color: #0A2A56;
-            color: white;
-            text-align: center;
-            font-family: 'Arial', sans-serif;
-        }
-        .navbar {
-            background-color: #103D6B; 
-            padding: 10px 20px;
-        }
-        .container {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: center;
-            min-height: 80vh;
+            height: 100vh;
+            background-color: #f8f9fa;
         }
-        .selection {
-            display: flex;
-            justify-content: center;
-            gap: 15px; /* Reduced spacing */
+        .container-box {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
         .option {
-            width: 220px;
-            padding: 20px;
-            background: #103D6B;
-            border-radius: 15px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            background-color: #007BFF; /* Updated to match login button */
+            color: white;
             cursor: pointer;
             transition: all 0.3s ease-in-out;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            font-size: 20px; /* Increased text size */
-            font-weight: bold;
+            margin-bottom: 10px;
+            border: none;
         }
         .option:hover {
-            transform: scale(1.05);
-            background: #0C3A63;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
-        }
-        .btn-logout {
-            background-color: white;
-            color: #D32F2F;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .btn-logout:hover {
-            background-color: #f2f2f2;
-        }
-        footer {
-            background-color: #103D6B;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
+            background-color: #0066FF; /* Slightly darker shade on hover */
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark">
-        <div class="container-fluid d-flex justify-content-between align-items-center">
-            <a class="navbar-brand text-white fw-bold">Digital Barangay Information System</a>
-            <a class="btn btn-logout" href="logout.php">Logout</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <h2 class="mb-4">Welcome!</h2>
-        <div class="selection">
-            <div class="option" onclick="location.href='login_resident.php'">
-                Resident
-            </div>
-            <div class="option" onclick="location.href='login_official.php'">
-                Barangay Official
-            </div>
+    <div class="container-box">
+        <h2>Welcome!</h2>
+        <div class="d-grid gap-3">
+            <button class="option" onclick="location.href='login_resident.php'">Resident</button>
+            <button class="option" onclick="location.href='login_official.php'">Barangay Official</button>
         </div>
     </div>
-
-    <footer>
-        &copy; <?php echo date("Y"); ?> Digital Barangay Information System. All rights reserved.
-    </footer>
 </body>
 </html>
