@@ -74,6 +74,7 @@
         <div class="container-fluid">
             <a class="navbar-brand text-white fw-bold" href="#">Barangay Official Dashboard</a>
             <a class="btn btn-outline-light" href="index.php">Logout</a>
+
         </div>
     </nav>
     
