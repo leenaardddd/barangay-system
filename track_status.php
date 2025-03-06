@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Status</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -49,11 +50,15 @@
             <a class="navbar-brand" href="#">Track Status</a>
             <div class="text-white">
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>!
+                <a class="btn btn-outline-light" href="index.php">Logout</a>
             </div>
         </div>
     </nav>
     <div class="container mt-4">
         <div class="card p-4">
+        <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
             <h1 class="text-center">Track Request/Complaint Status</h1>
             <?php
             if (isset($_GET['tracking_id'])) {

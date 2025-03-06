@@ -20,26 +20,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['schedule_appointment']
     $appointment_date = $_POST['appointment_date'];
     $purpose = $_POST['purpose'];
 
-    // Check if resident_id exists
-    $stmt = $conn->prepare("SELECT id FROM residents WHERE id = ?");
-    $stmt->bind_param("i", $resident_id);
-    $stmt->execute();
-    $stmt->store_result();
+    // Validate Resident ID
+    if (!is_numeric($resident_id)) {
+        $notification = '<div class="alert alert-danger">Error: Resident ID must be a number.</div>';
+    } 
+    // Validate appointment date
+    elseif (strtotime($appointment_date) < strtotime(date('Y-m-d'))) {
+        $notification = '<div class="alert alert-danger">Error: Appointment date cannot be in the past.</div>';
+    } 
+    else {
+        // Check if resident_id exists
+        $stmt = $conn->prepare("SELECT id FROM residents WHERE id = ?");
+        $stmt->bind_param("i", $resident_id);
+        $stmt->execute();
+        $stmt->store_result();
 
-    if ($stmt->num_rows > 0) {
-        $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose, status) VALUES (?, ?, ?, 'Pending')");
-        $stmt->bind_param("iss", $resident_id, $appointment_date, $purpose);
-        if ($stmt->execute()) {
-            $notification = '<div class="alert alert-success">Appointment scheduled and pending approval!</div>';
-            $popup_message = 'Appointment scheduled!';
+        if ($stmt->num_rows > 0) {
+            $stmt->close();
+            $stmt = $conn->prepare("INSERT INTO appointments (resident_id, appointment_date, purpose, status) VALUES (?, ?, ?, 'Pending')");
+            $stmt->bind_param("iss", $resident_id, $appointment_date, $purpose);
+            if ($stmt->execute()) {
+                $notification = '<div class="alert alert-success">Appointment scheduled and pending approval!</div>';
+                $popup_message = 'Appointment scheduled!';
+            } else {
+                $notification = '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+            }
+            $stmt->close();
         } else {
-            $notification = '<div class="alert alert-danger">Error: ' . $stmt->error . '</div>';
+            $notification = '<div class="alert alert-danger">Error: Resident ID does not exist.</div>';
+            $stmt->close();
         }
-        $stmt->close();
-    } else {
-        $notification = '<div class="alert alert-danger">Error: Resident ID does not exist.</div>';
-        $stmt->close();
     }
 }
 
@@ -86,6 +96,8 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointments Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -147,11 +159,16 @@ $result = $conn->query($sql);
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>! 
                 You are logged in as an <strong><?php echo $_SESSION['role'] ?? 'No Role'; ?></strong>.
             </div>
+            <a class="btn btn-outline-light" href="index.php">Logout</a>
         </div>
     </nav>
 
     <div class="container mt-4">
+        <?php if (isset($notification)) { echo $notification; } ?>
         <div class="card p-4">
+            <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
             <h2 class="text-center">Schedule a New Appointment</h2>
             <form method="POST" class="mt-3">
                 <input type="hidden" name="schedule_appointment" value="1">

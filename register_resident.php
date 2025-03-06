@@ -23,8 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['message'] = "All fields are required.";
     } elseif (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $birthdate)) {
         $_SESSION['message'] = "Invalid birthdate format. Use YYYY-MM-DD.";
-    } elseif (!preg_match("/^\d{10}$/", $contact_number)) {
-        $_SESSION['message'] = "Invalid contact number format. Use 10 digits.";
+    } elseif (strtotime($birthdate) > time()) {
+        $_SESSION['message'] = "Birthdate cannot be in the future.";
+    } elseif (!preg_match("/^\d{11}$/", $contact_number)) {
+        $_SESSION['message'] = "Invalid contact number format. Use 11 digits.";
     } else {
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
@@ -74,6 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Resident</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <style>
         body {
             display: flex;
@@ -84,7 +87,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .register-container {
             background-color: #fff;
-            padding: 35px;
+            padding-top: 10px;
+            padding-left: 35px;
+            padding-right: 35px;
+            padding-bottom: 35px;
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             width: 400px; /* Better width */
@@ -121,6 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="register-container">
+    <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>  
         <h2 class="text-center">Register Resident</h2>
         <?php
         if (isset($_SESSION['message'])) {
@@ -150,10 +157,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="address">Address</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="Contact Number" pattern="\d{10}" required>
+                <input type="text" class="form-control" id="contact_number" name="contact_number" placeholder="Contact Number" pattern="\d{11}" maxlength="11" required>
                 <label for="contact_number">Contact Number</label>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Register</button>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
+            <a class="btn btn-secondary w-100" href="login_resident.php">Login</a>
+            <p class="text-center">Have an account?</p>
         </form>
     </div>
 </body>

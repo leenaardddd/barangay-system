@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Directory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -31,12 +32,16 @@
             <a class="navbar-brand" href="#">Online Directory</a>
             <div class="text-white">
                 <i class="fas fa-user-check"></i> Welcome, <strong><?php echo $_SESSION['username'] ?? 'Guest'; ?></strong>!
+                <a class="btn btn-outline-light" href="index.php">Logout</a>
             </div>
         </div>
     </nav>
     <div class="container mt-4">
         <div class="card p-4">
-            <h1 class="text-center">Online Directory</h1>
+            <div>
+                <button class="btn btn-link" onclick="window.history.back()"><i class="bi bi-arrow-left" style="color: #6c757d;"></i></button>
+            </div>
+            <h1 class="text-center mb-4"><strong>DIRECTORY</strong></h1>
             <h2>Barangay Officials</h2>
             <div class="list-group mb-4">
                 <!-- Example official entry -->
@@ -47,7 +52,7 @@
                 </div>
                 <!-- Add more official entries as needed -->
             </div>
-            <h2>Services</h2>
+            <h2>Services</h2> 
             <div class="list-group mb-4">
                 <!-- Example service entry -->
                 <div class="list-group-item">
